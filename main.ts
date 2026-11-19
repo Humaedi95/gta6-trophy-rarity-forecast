@@ -122,7 +122,13 @@ function forecastCase(c: CaseFile): { trophies: { id: number; q: number[] }[] } 
     Math.max(0.25, (ms - launchMs) / 3600000);
 
   const reads = (c.history ?? []).filter(
-    (r) => r && Number.isFinite(Date.parse(r.at)) && r.players_tracked > 0,
+    (r) =>
+      r &&
+      Number.isFinite(Date.parse(r.at)) &&
+      r.players_tracked > 0 &&
+      // Only reads at or before the checkpoint belong to the case; a
+      // stray later read must never leak into the fit.
+      Date.parse(r.at) <= atMs,
   );
   const nTrophies = c.trophies.length;
 
